@@ -492,33 +492,34 @@ function buildSheet(plate, records, pdfExtras, taxId) {
     sc(row, col, val, { align:'right', ...opts, border:true });
   }
 
-  function numOrDash(v) { return v ? v : '-'; }
+  // number format: แสดง 0 เป็น "-" แต่ยังเป็น number ให้ formula ใช้ได้
+  const DASH_FMT = '#,##0.00;-#,##0.00;"-"';
 
   // แถว ทางด่วนและรถไฟฟ้า (E-H มีขอบบาง)
   const rowEB = r;
   for(let c=1;c<=4;c++) sc(r,c,'',{border:false});
   sc(r,5,'ทางด่วนและรถไฟฟ้า',{ align:'left' });
-  sc(r,6, numOrDash(ebBT),  { align:'right', numFmt: ebBT  ? NUM_FMT : undefined });
-  sc(r,7, numOrDash(ebTx),  { align:'right', numFmt: ebTx  ? NUM_FMT : undefined });
-  sc(r,8, numOrDash(ebTot), { align:'right', numFmt: ebTot ? NUM_FMT : undefined });
+  sc(r,6, ebBT,  { align:'right', numFmt:DASH_FMT });
+  sc(r,7, ebTx,  { align:'right', numFmt:DASH_FMT });
+  sc(r,8, ebTot, { align:'right', numFmt:DASH_FMT });
   rowHeights[r-1] = { hpt:18 }; r++;
 
   // แถว การทางพิเศษฯ
   const rowEE = r;
   for(let c=1;c<=4;c++) sc(r,c,'',{border:false});
   sc(r,5,'การทางพิเศษฯ',{ align:'left' });
-  sc(r,6, numOrDash(eeBT),  { align:'right', numFmt: eeBT  ? NUM_FMT : undefined });
-  sc(r,7, numOrDash(eeTx),  { align:'right', numFmt: eeTx  ? NUM_FMT : undefined });
-  sc(r,8, numOrDash(eeTot), { align:'right', numFmt: eeTot ? NUM_FMT : undefined });
+  sc(r,6, eeBT,  { align:'right', numFmt:DASH_FMT });
+  sc(r,7, eeTx,  { align:'right', numFmt:DASH_FMT });
+  sc(r,8, eeTot, { align:'right', numFmt:DASH_FMT });
   rowHeights[r-1] = { hpt:18 }; r++;
 
   // แถว ด่านไม่มีใบกำกับภาษี
   const rowT2 = r;
   for(let c=1;c<=4;c++) sc(r,c,'',{border:false});
   sc(r,5,'ด่านไม่มีใบกำกับภาษี',{ align:'left' });
-  sc(r,6, numOrDash(t2BT),  { align:'right', numFmt: t2BT  ? NUM_FMT : undefined });
-  sc(r,7, '-',               { align:'center' });
-  sc(r,8, numOrDash(t2Tot), { align:'right', numFmt: t2Tot ? NUM_FMT : undefined });
+  sc(r,6, t2BT,  { align:'right', numFmt:DASH_FMT });
+  sc(r,7, 0,     { align:'right', numFmt:DASH_FMT });
+  sc(r,8, t2Tot, { align:'right', numFmt:DASH_FMT });
   rowHeights[r-1] = { hpt:18 }; r++;
 
   // ยอดรวมทั้งสิ้น (A-E ว่าง, F-H ตัวหนา+ขอบบาง)
