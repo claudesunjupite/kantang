@@ -431,13 +431,13 @@ function buildSheet(plate, records, pdfExtras, taxId) {
     r++;
   }
 
-  // ── Table 1 รวม: A-E ว่าง, F-H ตัวหนา+ขอบ
+  // ── Table 1 รวม: A-E ว่าง, F-H ตัวหนา+ขอบบาง
   const t1End=r-1, t1TotalRow=r;
   for (let ci=0; ci<5; ci++) sc(t1TotalRow,ci+1,'',{ border:false });
   [`=SUM(F${t1DataStart}:F${t1End})`,
    `=SUM(G${t1DataStart}:G${t1End})`,
    `=SUM(H${t1DataStart}:H${t1End})`].forEach((v,ci) => {
-    sc(t1TotalRow,ci+6,v,{ bold:true, align:'right', numFmt:NUM_FMT, medium:true });
+    sc(t1TotalRow,ci+6,v,{ bold:true, align:'right', numFmt:NUM_FMT });
   });
   rowHeights[t1TotalRow-1] = { hpt:20 };
   r++;
@@ -472,13 +472,13 @@ function buildSheet(plate, records, pdfExtras, taxId) {
       r++;
     }
 
-    // Table 2 รวม: A-E ว่าง, F+H ตัวหนา+ขอบ, G ว่าง+ขอบ
+    // Table 2 รวม: A-E ว่าง, F+H ตัวหนา+ขอบบาง, G ว่าง+ขอบบาง
     const t2End=r-1;
     t2TotalRow=r;
     for (let ci=0; ci<5; ci++) sc(t2TotalRow,ci+1,'',{ border:false });
-    sc(t2TotalRow,6,`=SUM(F${t2DataStart}:F${t2End})`,{ bold:true, align:'right', numFmt:NUM_FMT, medium:true });
-    sc(t2TotalRow,7,'',{ medium:true });
-    sc(t2TotalRow,8,`=SUM(H${t2DataStart}:H${t2End})`,{ bold:true, align:'right', numFmt:NUM_FMT, medium:true });
+    sc(t2TotalRow,6,`=SUM(F${t2DataStart}:F${t2End})`,{ bold:true, align:'right', numFmt:NUM_FMT });
+    sc(t2TotalRow,7,'',{ border:true });
+    sc(t2TotalRow,8,`=SUM(H${t2DataStart}:H${t2End})`,{ bold:true, align:'right', numFmt:NUM_FMT });
     rowHeights[t2TotalRow-1] = { hpt:16 };
     r++;
   }
@@ -521,11 +521,11 @@ function buildSheet(plate, records, pdfExtras, taxId) {
   sc(r,8, numOrDash(t2Tot), { align:'right', numFmt: t2Tot ? NUM_FMT : undefined });
   rowHeights[r-1] = { hpt:18 }; r++;
 
-  // ยอดรวมทั้งสิ้น (A-E ว่าง, F-H ตัวหนา+ขอบหนา)
+  // ยอดรวมทั้งสิ้น (A-E ว่าง, F-H ตัวหนา+ขอบบาง)
   for(let c=1;c<=5;c++) sc(r,c,'',{border:false});
-  sc(r,6,`=F${rowEB}+F${rowEE}+F${rowT2}`,{ bold:true, align:'right', numFmt:NUM_FMT, medium:true });
-  sc(r,7,`=G${rowEB}+G${rowEE}+G${rowT2}`,{ bold:true, align:'right', numFmt:NUM_FMT, medium:true });
-  sc(r,8,`=H${rowEB}+H${rowEE}+H${rowT2}`,{ bold:true, align:'right', numFmt:NUM_FMT, medium:true });
+  sc(r,6,`=F${rowEB}+F${rowEE}+F${rowT2}`,{ bold:true, align:'right', numFmt:NUM_FMT });
+  sc(r,7,`=G${rowEB}+G${rowEE}+G${rowT2}`,{ bold:true, align:'right', numFmt:NUM_FMT });
+  sc(r,8,`=H${rowEB}+H${rowEE}+H${rowT2}`,{ bold:true, align:'right', numFmt:NUM_FMT });
   rowHeights[r-1] = { hpt:20 };
 
   ws['!ref']        = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:maxR,c:maxC} });
