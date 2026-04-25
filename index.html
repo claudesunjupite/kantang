@@ -386,33 +386,30 @@ function buildSheet(plate, records, pdfExtras, taxId) {
   const dateRangeLeft  = `1-${lastDay}/${monthStr}/${beYear}`;
   const dateRangeRight = `ยื่นภาษี ด.${monthStr}/${yearShort}`;
 
-  // ── Row 1: บริษัท (center, full merge)
-  merge(1,1,1,8);
+  // ── Row 1: บริษัท (ซ้าย A:F) / ทะเบียน (ขวา G:H)
+  merge(1,1,1,6);
   sc(1,1,'บจก.ซันจูปิเตอร์', { bold:true, sz:16, border:false, align:'center' });
+  merge(1,7,1,8);
+  sc(1,7,`ทะเบียน  ${plate}`, { bold:true, sz:16, border:false, align:'center' });
   rowHeights[0] = { hpt: 26 };
 
-  // ── Row 2: ทะเบียน (center, full merge)
-  merge(2,1,2,8);
-  sc(2,1,`ทะเบียน  ${plate}`, { bold:true, sz:16, border:false, align:'center' });
-  rowHeights[1] = { hpt: 26 };
+  // ── Row 2: ช่วงวันที่ พ.ศ. (ซ้าย A:F) / ยื่นภาษี (ขวา G:H)
+  merge(2,1,2,6);
+  sc(2,1, dateRangeLeft,  { sz:16, border:false, align:'center' });
+  merge(2,7,2,8);
+  sc(2,7, dateRangeRight, { sz:16, border:false, align:'center' });
+  rowHeights[1] = { hpt: 22 };
 
-  // ── Row 3: ช่วงวันที่ พ.ศ. (ซ้าย) / ยื่นภาษี (ขวา)
-  merge(3,1,3,6);
-  sc(3,1, dateRangeLeft,  { sz:16, border:false, align:'left' });
-  merge(3,7,3,8);
-  sc(3,7, dateRangeRight, { sz:16, border:false, align:'right' });
-  rowHeights[2] = { hpt: 22 };
+  // ── Row 3: spacer
+  rowHeights[2] = { hpt: 6 };
 
-  // ── Row 4: spacer
-  rowHeights[3] = { hpt: 6 };
-
-  // ── Row 5: หัวตาราง 1
+  // ── Row 4: หัวตาราง 1 (ขาวดำ — ตัวหนา + ขอบ)
   const HEADERS = ['ลำดับ','ว.ด.ป.','ทะเบียนรถ','INV.','รายการ','ก่อนภาษี','ภาษี','รวมภาษี'];
-  HEADERS.forEach((h,i) => sc(5,i+1,h,{ bold:true, fill:COL_GRAY, medium:true }));
-  rowHeights[4] = { hpt: 20 };
+  HEADERS.forEach((h,i) => sc(4,i+1,h,{ bold:true, medium:true }));
+  rowHeights[3] = { hpt: 20 };
 
   // ── แถวข้อมูล Table 1 + track EB/EE subtotals
-  let r = 6;
+  let r = 5;
   const t1DataStart = r;
   let ebBT=0, ebTx=0, ebTot=0;
   let eeBT=0, eeTx=0, eeTot=0;
@@ -421,17 +418,16 @@ function buildSheet(plate, records, pdfExtras, taxId) {
     const rec  = records[i];
     const isEB = rec.inv.toUpperCase().startsWith('EB');
     const label = isEB ? 'ทางด่วนและรถไฟฟ้า' : 'การทางพิเศษฯ';
-    const color = isEB ? 'FF0000' : '000000';
-    const bg    = isEB ? COL_RED : undefined;
     if (isEB) { ebBT+=rec.beforeTax; ebTx+=rec.tax; ebTot+=rec.total; }
     else      { eeBT+=rec.beforeTax; eeTx+=rec.tax; eeTot+=rec.total; }
     [i+1, fmtDt(rec.dt), rec.plate, rec.inv, label,
      rec.beforeTax, rec.tax, rec.total].forEach((v,ci) => {
-      sc(r,ci+1,v,{ color, fill:bg,
+      sc(r,ci+1,v,{
+        bold: isEB,
         align: ci>=5?'right': ci===4?'left':'center',
         numFmt: ci>=5?NUM_FMT:undefined });
     });
-    rowHeights[r-1] = { hpt:15 };
+    rowHeights[r-1] = { hpt:18 };
     r++;
   }
 
@@ -441,10 +437,10 @@ function buildSheet(plate, records, pdfExtras, taxId) {
    `=SUM(F${t1DataStart}:F${t1End})`,
    `=SUM(G${t1DataStart}:G${t1End})`,
    `=SUM(H${t1DataStart}:H${t1End})`].forEach((v,ci) => {
-    sc(t1TotalRow,ci+1,v,{ bold:true, fill:COL_LGRAY,
+    sc(t1TotalRow,ci+1,v,{ bold:true,
       align:ci>=4?'right':'center', numFmt:ci>=5?NUM_FMT:undefined });
   });
-  rowHeights[t1TotalRow-1] = { hpt:16 };
+  rowHeights[t1TotalRow-1] = { hpt:20 };
   r++;
 
   // ── Table 2 (ด่านไม่มีใบกำกับภาษี จาก PDF)
@@ -455,7 +451,7 @@ function buildSheet(plate, records, pdfExtras, taxId) {
     r += 3; // ช่องว่าง 3 แถว
 
     // หัวตาราง 2 (8 คอลัมน์เหมือน Table 1)
-    HEADERS.forEach((h,i) => sc(r,i+1,h,{ bold:true, fill:COL_GRAY, medium:true }));
+    HEADERS.forEach((h,i) => sc(r,i+1,h,{ bold:true, medium:true }));
     rowHeights[r-1] = { hpt:18 };
     r++;
 
@@ -484,7 +480,7 @@ function buildSheet(plate, records, pdfExtras, taxId) {
      `=SUM(F${t2DataStart}:F${t2End})`,
      '',
      `=SUM(H${t2DataStart}:H${t2End})`].forEach((v,ci) => {
-      sc(t2TotalRow,ci+1,v,{ bold:true, fill:COL_LGRAY,
+      sc(t2TotalRow,ci+1,v,{ bold:true,
         align:ci>=4?'right':'center', numFmt:(ci===5||ci===7)?NUM_FMT:undefined });
     });
     rowHeights[t2TotalRow-1] = { hpt:16 };
@@ -519,17 +515,17 @@ function buildSheet(plate, records, pdfExtras, taxId) {
   sc(r,8, t2Tot || '', { ...sumOpts(), numFmt: t2Tot ? NUM_FMT : undefined });
   rowHeights[r-1] = { hpt:15 }; r++;
 
-  // ยอดรวมทั้งสิ้น (เหลือง)
-  sc(r,6,`=F${rowEB}+F${rowEE}+F${rowT2}`,{ bold:true, sz:11, fill:COL_YELLOW, border:false, align:'right', numFmt:NUM_FMT });
-  sc(r,7,`=G${rowEB}+G${rowEE}+G${rowT2}`,{ bold:true, sz:11, fill:COL_YELLOW, border:false, align:'right', numFmt:NUM_FMT });
-  sc(r,8,`=H${rowEB}+H${rowEE}+H${rowT2}`,{ bold:true, sz:11, fill:COL_YELLOW, border:false, align:'right', numFmt:NUM_FMT });
+  // ยอดรวมทั้งสิ้น
+  sc(r,6,`=F${rowEB}+F${rowEE}+F${rowT2}`,{ bold:true, border:false, align:'right', numFmt:NUM_FMT });
+  sc(r,7,`=G${rowEB}+G${rowEE}+G${rowT2}`,{ bold:true, border:false, align:'right', numFmt:NUM_FMT });
+  sc(r,8,`=H${rowEB}+H${rowEE}+H${rowT2}`,{ bold:true, border:false, align:'right', numFmt:NUM_FMT });
   rowHeights[r-1] = { hpt:20 };
 
   ws['!ref']    = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:maxR,c:maxC} });
   ws['!merges'] = merges;
   ws['!rows']   = rowHeights;
   ws['!cols']   = colWidths;
-  ws['!freeze'] = { ySplit: 5 };
+  ws['!freeze'] = { ySplit: 4 };
   return ws;
 }
 
