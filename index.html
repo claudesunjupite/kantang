@@ -18,6 +18,14 @@
       align-items: center; justify-content: center;
       padding: 2rem 1rem;
     }
+    .topbar {
+      width: 100%; max-width: 620px;
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem; padding: 0 0.25rem;
+    }
+    .topbar img { height: 42px; width: auto; object-fit: contain; }
+    .company-name { font-size: 1rem; font-weight: 600; color: #1e2d4a; line-height: 1.3; }
+    .company-sub  { font-size: 0.72rem; color: #64748b; font-weight: 400; }
     .card {
       background: #fff; border-radius: 18px;
       box-shadow: 0 4px 32px rgba(0,0,0,0.09);
@@ -25,11 +33,6 @@
       width: 100%; max-width: 620px;
     }
     .header { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.4rem; }
-    .logo {
-      width: 40px; height: 40px; background: #1e3a8a;
-      border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-size: 1.3rem;
-    }
     h1 { font-size: 1.4rem; font-weight: 600; color: #1e2d4a; }
     .subtitle { font-size: 0.85rem; color: #64748b; margin-bottom: 2rem; margin-left: 52px; }
     .divider { height: 1px; background: #e8ecf0; margin: 1.5rem 0; }
@@ -95,9 +98,15 @@
   </style>
 </head>
 <body>
+<div class="topbar">
+  <img src="sunjupiter-logo.png" alt="Sun Jupiter Logo">
+  <div>
+    <div class="company-name">Sun Jupiter Corporation</div>
+    <div class="company-sub">ระบบสร้างรายงานการทางพิเศษ</div>
+  </div>
+</div>
 <div class="card">
   <div class="header">
-    <div class="logo">🛣️</div>
     <h1>การทางพิเศษ</h1>
   </div>
   <p class="subtitle">สร้างรายงาน Excel จากข้อมูล CSV และใบกำกับ PDF</p>
